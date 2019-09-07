@@ -46,22 +46,33 @@ def extract_names(filename):
     followed by the name-rank strings in alphabetical order.
     ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
     """
-    name = []
-    f_read = open(filename, "f" )
-    text = f_read.read()
-    yr_str = re.search(r'Popularity\sin\s(\d\d\d\d', text)
-    if not yr_str:
-        sys.exit(1)
-    yr = yr_str.group(1)
-    name.append(yr)
+    f = open(filename, 'rU')
+    text = f.read()
+    f.close()
+    result = []
+    year = re.search(r'Popularity\sin\s(\d\d\d\d', text)
+    if year:
+        result.append(year.group(1))
+    else:
+        print("year not found") 
+    tuples = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
 
+    d = {}
+    for rank, boy, girl in tuples:
+        d[boy] = rank
+        d[girl] = rank
+
+    for t in tuples:
+        result.append((t[2], t[0]))
+        result.append((t[1], t[0]))
+
+    return sorted(result)    
 
 
 def create_parser():
     """Create a cmd line parser object with 2 argument definitions"""
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--summaryfile', help='creates a summary file', action='store_true')
+    parser.add_argument('--summaryfile', help='creates a summary file', action='store_true')
     # The nargs option instructs the parser to expect 1 or more filenames.
     # It will also expand wildcards just like the shell, e.g. 'baby*.html' will work.
     parser.add_argument('files', help='filename(s) to parse', nargs='+')
@@ -77,14 +88,16 @@ def main():
         sys.exit(1)
 
     file_list = args.files
-
-    # option flag
     create_summary = args.summaryfile
-
-    # +++your code here+++
     # For each filename, get the names, then either print the text output
     # or write it to a summary file
-
-
+    for file in file_list:
+        names = '\n'.join(extract_names(file))
+        if create_summary:
+            text_file = open(file + '.summary', 'w')
+            text_file.write(names + "\n")     
+        else:
+            print(names)
+        
 if __name__ == '__main__':
     main()
