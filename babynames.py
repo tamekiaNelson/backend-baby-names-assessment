@@ -10,6 +10,7 @@
 # Google's Python Class
 # http://code.google.com/edu/languages/google-python-class/
 
+
 import sys
 import re
 import argparse
@@ -45,8 +46,15 @@ def extract_names(filename):
     followed by the name-rank strings in alphabetical order.
     ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
     """
-    # +++your code here+++
-    return
+    name = []
+    f_read = open(filename, "f" )
+    text = f_read.read()
+    yr_str = re.search(r'Popularity\sin\s(\d\d\d\d', text)
+    if not yr_str:
+        sys.exit(1)
+    yr = yr_str.group(1)
+    name.append(yr)
+
 
 
 def create_parser():
